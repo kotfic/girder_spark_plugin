@@ -1,0 +1,8 @@
+pip>=9
+tox
+twine
+virtualenv
+flake8
+flake8-blind-except
+flake8-docstrings>=1.3
+
