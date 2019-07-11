@@ -30,7 +30,7 @@ def spark_job_endpoint(self, item, image_path, spark_opts):
     if len(result.errors):
         error_msg = 'Errors were found in your arguments:\n'
         for key, value in result.errors.items():
-            error_msg += f'  {key}: {value}\n'
+            error_msg += '  {}: {}\n'.format(key, value)
 
         raise RestException(error_msg, code=422)
 

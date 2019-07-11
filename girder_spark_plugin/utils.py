@@ -69,14 +69,14 @@ def make_cli_opts(data, schema_cls=SparkOptsSchema):
     cli_opts = []
     for key, val in data.items():
         if isinstance(schema.fields[key], fields.List):
-            cli_opts.extend([f'{SPARK_OPT_MAP[key]}',f'{",".join(val)}'])
+            cli_opts.extend(['{}'.format(SPARK_OPT_MAP[key]), '{}'.format(",".join(val))])
         elif isinstance(schema.fields[key], fields.Dict):
             for prop, spark_val in val.items():
-                cli_opts.extend([f'{SPARK_OPT_MAP[key]}',f'{prop}={spark_val}'])
+                cli_opts.extend(['{}'.format(SPARK_OPT_MAP[key]), '{}={}'.format(prop, spark_val)])
         elif isinstance(schema.fields[key], fields.Bool):
             if val:
-                cli_opts.append(f'{SPARK_OPT_MAP[key]}')
+                cli_opts.append('{}'.format(SPARK_OPT_MAP[key]))
         else:
-            cli_opts.extend([f'{SPARK_OPT_MAP[key]}',f'{val}'])
+            cli_opts.extend(['{}'.format(SPARK_OPT_MAP[key]),'{}'.format(val)])
 
     return cli_opts

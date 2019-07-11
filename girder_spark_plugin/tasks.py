@@ -7,7 +7,7 @@ from girder_worker.app import app
 from girder_worker.utils import girder_job
 
 SPARK_HOME='/home/kotfic/kitware/projects/hpcmp/demo/july_2019/spark/spark-2.4.3-bin-hadoop2.7'
-DEFAULT_SPARK_SUBMIT_CMD=f'{SPARK_HOME}/bin/spark-submit'
+DEFAULT_SPARK_SUBMIT_CMD='{}/bin/spark-submit'.format(SPARK_HOME)
 
 
 @girder_job(title='Spark Job')
@@ -27,8 +27,8 @@ def spark_job(self, file_path,
     env = os.environ.copy()
     env['SPARK_HOME'] =  SPARK_HOME
 
-    self.job_manager.write(f'[INFO] Running spark cmd {spark_cmd}')
-    self.job_manager.write(f'\n\n')
+    self.job_manager.write('[INFO] Running spark cmd {}'.format(spark_cmd))
+    self.job_manager.write('\n\n')
 
     proc = subprocess.Popen(spark_cmd,
                             env=env,
@@ -38,15 +38,15 @@ def spark_job(self, file_path,
     output = ''
     for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
         output += line
-        self.job_manager.write(f'[INFO] Output:   {line}')
+        self.job_manager.write('[INFO] Output:   {}'.format(line))
 
-    self.job_manager.write(f'\n\n')
-    self.job_manager.write(f'[INFO] Complete')
+    self.job_manager.write('\n\n')
+    self.job_manager.write('[INFO] Complete')
 
     proc.wait()
     if proc.returncode != 0:
-            raise RuntimeError(f'\n\nSpark job did not successfully submit: {proc.returncode}'
-                           f'\n{spark_cmd}'
-                           f'\n\n{output}')
+        raise RuntimeError('\n\nSpark job did not successfully submit: {}'.format(proc.returncode) +
+                           '\n{}'.format(spark_cmd) +
+                           '\n\n{}'.format(output))
 
     return proc.returncode
