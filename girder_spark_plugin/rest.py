@@ -18,15 +18,13 @@ from girder_spark_plugin.utils import GirderFiletoNamedPath, SparkOptsSchema, ma
     Description('Launch a Spark Job')
     .notes('This endpoint launches a spark job defined by a pyspark file '
            'associated with an item.')
-    .modelParam('id', model=Item, level=AccessType.READ)
-    .param('master', 'spark://host:port, mesos://host:port, yarn, k8s://https://host:port, or local (Default: local[*]).)')
+    .modelParam('id', model=Item, level=AccessType.READ, required=True)
+    .param('image_path', 'path to singularity image for submitting spark job', required=True)
+    .param('spark_opts', 'Options for spark', paramType='body', required=True)
     .errorResponse()
     .errorResponse('You are not an administrator.', 403))
-def spark_job_endpoint(self, item, master):
-    _spark_opts = {
-        'master': master,
-        'verbose': True
-    }
+def spark_job_endpoint(self, item, image_path, spark_opts):
+    _spark_opts = self.getBodyJson()
     result = SparkOptsSchema().load(_spark_opts)
 
     if len(result.errors):
@@ -40,10 +38,7 @@ def spark_job_endpoint(self, item, master):
 
     async_result = spark_job.delay(
         GirderFiletoNamedPath(_file),
-        spark_submit_cmd=[
-            '/usr/local/bin/singularity', 'run',
-            '/home/kotfic/kitware/projects/hpcmp/demo/july_2019/spark/spark.simg'
-        ],
+        spark_submit_cmd=['singularity', 'run', image_path],
         spark_submit_opts=make_cli_opts(result.data)
     )
 
