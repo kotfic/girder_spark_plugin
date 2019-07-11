@@ -25,6 +25,7 @@ from girder_spark_plugin.utils import GirderFiletoNamedPath, SparkOptsSchema, ma
 def spark_job_endpoint(self, item, master):
     _spark_opts = {
         'master': master,
+        'verbose': True
     }
     result = SparkOptsSchema().load(_spark_opts)
 
@@ -39,6 +40,10 @@ def spark_job_endpoint(self, item, master):
 
     async_result = spark_job.delay(
         GirderFiletoNamedPath(_file),
+        spark_submit_cmd=[
+            '/usr/local/bin/singularity', 'run',
+            '/home/kotfic/kitware/projects/hpcmp/demo/july_2019/spark/spark.simg'
+        ],
         spark_submit_opts=make_cli_opts(result.data)
     )
 
