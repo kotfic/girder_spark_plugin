@@ -3,7 +3,7 @@ import shutil
 import tempfile
 
 from girder_worker_utils.transforms.girder_io import GirderClientTransform
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 
 class GirderFiletoNamedPath(GirderClientTransform):
     """

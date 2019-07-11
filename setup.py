@@ -9,7 +9,7 @@ with open('README.rst') as readme_file:
 requirements = [
     'girder>=3.0.0a1',
     'pyspark==2.4.3',
-    'marshmallow==2.19.5'
+    'marshmallow==3.0.0b10'
 ]
 
 setup(
@@ -40,10 +40,10 @@ setup(
     zip_safe=False,
     entry_points={
         'girder.plugin': [
-            'girder_spark_plugin = girder_spark_plugin:GirderPlugin'
+            'girder_spark_plugin = girder_spark_plugin.girder:GirderPlugin'
         ],
         'girder_worker_plugins': [
-            'girder_spark_plugin = girder_spark_plugin:GirderWorkerPlugin',
+            'girder_spark_plugin = girder_spark_plugin.worker:GirderWorkerPlugin',
         ]
     }
 )

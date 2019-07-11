@@ -1,3 +1,5 @@
+from marshmallow import ValidationError
+
 from girder.api import access
 from girder.api.describe import autoDescribeRoute, Description
 from girder.api.rest import boundHandler, filtermodel
@@ -23,23 +25,20 @@ from girder_spark_plugin.utils import GirderFiletoNamedPath, SparkOptsSchema, ma
     .param('spark_opts', 'Options for spark', paramType='body', required=True)
     .errorResponse()
     .errorResponse('You are not an administrator.', 403))
-def spark_job_endpoint(self, item, image_path, spark_opts):
+def spark_job_endpoint(self, item, image_path, *args):
     _spark_opts = self.getBodyJson()
-    result = SparkOptsSchema().load(_spark_opts)
-
-    if len(result.errors):
-        error_msg = 'Errors were found in your arguments:\n'
-        for key, value in result.errors.items():
-            error_msg += '  {}: {}\n'.format(key, value)
-
-        raise RestException(error_msg, code=422)
+    try:
+        result = SparkOptsSchema().load(_spark_opts)
+    except ValidationError as e:
+        raise RestException(', '.join(["{}: {}".format(k,v) for k,v in e.messages.items()]),
+                            code=422)
 
     _file = list(Item().childFiles(item))[0]
 
     async_result = spark_job.delay(
         GirderFiletoNamedPath(_file),
         spark_submit_cmd=['singularity', 'run', image_path],
-        spark_submit_opts=make_cli_opts(result.data)
+        spark_submit_opts=make_cli_opts(result)
     )
 
     return async_result.job
