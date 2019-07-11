@@ -13,11 +13,14 @@ DEFAULT_SPARK_SUBMIT_CMD=f'{SPARK_HOME}/bin/spark-submit'
 @girder_job(title='Spark Job')
 @app.task(bind=True)
 def spark_job(self, file_path,
-              spark_submit_cmd=DEFAULT_SPARK_SUBMIT_CMD,
+              spark_submit_cmd=None,
               spark_submit_opts=()):
     logger = get_task_logger(__name__)
 
-    spark_cmd = [spark_submit_cmd]
+    spark_cmd = spark_submit_cmd
+    if spark_cmd is None:
+        spark_cmd = [DEFAULT_SPARK_SUBMIT_CMD]
+
     spark_cmd.extend(spark_submit_opts)
     spark_cmd.append(file_path)
 

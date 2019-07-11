@@ -45,7 +45,8 @@ SPARK_OPT_MAP = {
     'py_files': '--py-files',
     'files': '--files',
     'conf': '--conf',
-    'properties_file': '--properties-file'
+    'properties_file': '--properties-file',
+    'verbose': '--verbose'
 }
 
 class SparkOptsSchema(Schema):
@@ -60,7 +61,7 @@ class SparkOptsSchema(Schema):
     files = fields.List(fields.Str(), required=False)
     conf = fields.Dict(keys=fields.Str(), values=fields.Str(), required=False)
     properties_file = fields.Str(required=False)
-
+    verbose = fields.Bool()
 
 def make_cli_opts(data, schema_cls=SparkOptsSchema):
     '''Make cli option list from data'''
@@ -68,11 +69,14 @@ def make_cli_opts(data, schema_cls=SparkOptsSchema):
     cli_opts = []
     for key, val in data.items():
         if isinstance(schema.fields[key], fields.List):
-            cli_opts.append(f'{SPARK_OPT_MAP[key]} {",".join(val)}')
+            cli_opts.extend([f'{SPARK_OPT_MAP[key]}',f'{",".join(val)}'])
         elif isinstance(schema.fields[key], fields.Dict):
             for prop, spark_val in val.items():
-                cli_opts.append(f'{SPARK_OPT_MAP[key]} {prop}={spark_val}')
+                cli_opts.extend([f'{SPARK_OPT_MAP[key]}',f'{prop}={spark_val}'])
+        elif isinstance(schema.fields[key], fields.Bool):
+            if val:
+                cli_opts.append(f'{SPARK_OPT_MAP[key]}')
         else:
-            cli_opts.append(f'{SPARK_OPT_MAP[key]} {val}')
+            cli_opts.extend([f'{SPARK_OPT_MAP[key]}',f'{val}'])
 
     return cli_opts
