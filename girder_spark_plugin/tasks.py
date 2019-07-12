@@ -5,7 +5,6 @@ import subprocess
 from girder_worker.app import app
 from girder_worker.utils import girder_job
 
-DEFAULT_SPARK_SUBMIT_CMD='{}/bin/spark-submit'.format(os.environ['SPARK_HOME'])
 
 @girder_job(title='Spark Job')
 @app.task(bind=True)
@@ -14,7 +13,10 @@ def spark_job(self, file_path,
               spark_submit_opts=()):
     spark_cmd = spark_submit_cmd
     if spark_cmd is None:
-        spark_cmd = [DEFAULT_SPARK_SUBMIT_CMD]
+        if os.environ.get('SPARK_HOME', None):
+            spark_cmd = ['{}/bin/spark-submit'.format(os.environ.get('SPARK_HOME'))]
+        else:
+            spark_cmd = ['spark-submit']
 
     spark_cmd.extend(spark_submit_opts)
     spark_cmd.append(file_path)
