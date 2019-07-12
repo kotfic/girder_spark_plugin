@@ -21,11 +21,10 @@ from girder_spark_plugin.utils import GirderFiletoNamedPath, SparkOptsSchema, ma
     .notes('This endpoint launches a spark job defined by a pyspark file '
            'associated with an item.')
     .modelParam('id', model=Item, level=AccessType.READ, required=True)
-    .param('image_path', 'path to singularity image for submitting spark job', required=True)
     .param('spark_opts', 'Options for spark', paramType='body', required=True)
     .errorResponse()
     .errorResponse('You are not an administrator.', 403))
-def spark_job_endpoint(self, item, image_path, *args):
+def spark_job_endpoint(self, item, *args):
     _spark_opts = self.getBodyJson()
     try:
         result = SparkOptsSchema().load(_spark_opts)
@@ -37,7 +36,6 @@ def spark_job_endpoint(self, item, image_path, *args):
 
     async_result = spark_job.delay(
         GirderFiletoNamedPath(_file),
-        spark_submit_cmd=['singularity', 'run', image_path],
         spark_submit_opts=make_cli_opts(result)
     )
 
