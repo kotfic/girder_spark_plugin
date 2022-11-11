@@ -8,7 +8,7 @@ with open('README.rst') as readme_file:
 
 requirements = [
     'girder>=3.0.0a1',
-    'pyspark==2.4.3',
+    'pyspark==3.2.2',
     'marshmallow==3.0.0b10'
 ]
 
